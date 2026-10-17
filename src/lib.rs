@@ -147,10 +147,7 @@ impl Dataset {
                 (raw_item, raw_item)
             };
 
-            let idx = self
-                .headers
-                .iter()
-                .position(|h| h.eq_ignore_ascii_case(src_name))
+            let idx = find_pedigree_synonym_column(src_name, &self.headers)
                 .ok_or_else(|| SsotError::ColumnNotFound(src_name.to_string()))?;
 
             col_indices.push(idx);
@@ -238,6 +235,48 @@ impl Dataset {
 
         Ok(result)
     }
+
+    pub fn canonicalize_pedigree_pt(&self) -> Self {
+        let new_headers = self
+            .headers
+            .iter()
+            .map(|h| {
+                let lower = h.to_lowercase();
+                for (pt, _, synonyms) in PEDIGREE_SYNONYM_GROUPS {
+                    if synonyms.iter().any(|&s| s == lower) {
+                        return pt.to_string();
+                    }
+                }
+                h.clone()
+            })
+            .collect();
+
+        Self {
+            headers: new_headers,
+            rows: self.rows.clone(),
+        }
+    }
+
+    pub fn canonicalize_pedigree_official(&self) -> Self {
+        let new_headers = self
+            .headers
+            .iter()
+            .map(|h| {
+                let lower = h.to_lowercase();
+                for (_, official, synonyms) in PEDIGREE_SYNONYM_GROUPS {
+                    if synonyms.iter().any(|&s| s == lower) {
+                        return official.to_string();
+                    }
+                }
+                h.clone()
+            })
+            .collect();
+
+        Self {
+            headers: new_headers,
+            rows: self.rows.clone(),
+        }
+    }
 }
 
 pub fn parse_block_directives(block: &str) -> HashMap<String, String> {
@@ -303,9 +342,7 @@ impl Condition {
                     .trim_matches('\'')
                     .to_string();
 
-                let col_index = headers
-                    .iter()
-                    .position(|h| h.eq_ignore_ascii_case(col_name))
+                let col_index = find_pedigree_synonym_column(col_name, headers)
                     .ok_or_else(|| SsotError::ColumnNotFound(col_name.to_string()))?;
 
                 return Ok(Self {
@@ -352,4 +389,66 @@ impl Condition {
             }
         }
     }
+}
+
+pub const PEDIGREE_SYNONYM_GROUPS: &[(&str, &str, &[&str])] = &[
+    ("id", "id", &["id", "individual", "codigo", "individuo"]),
+    (
+        "pai",
+        "fid",
+        &["pai", "fid", "father", "dadid", "progenitor", "pat"],
+    ),
+    (
+        "mae",
+        "mid",
+        &["mae", "mid", "mother", "momid", "progenitora", "mat"],
+    ),
+    ("sexo", "sex", &["sexo", "sex", "gender"]),
+    (
+        "fenotipo",
+        "aff",
+        &[
+            "fenotipo",
+            "aff",
+            "affected",
+            "afetado",
+            "status_clinico",
+            "phenotype",
+        ],
+    ),
+    (
+        "probando",
+        "proband",
+        &["probando", "probanda", "proband", "propositus", "proposito"],
+    ),
+    (
+        "falecido",
+        "status",
+        &["falecido", "deceased", "status", "obito"],
+    ),
+    (
+        "rotulo",
+        "label",
+        &["rotulo", "label", "rotulo_ped", "text", "nome"],
+    ),
+];
+
+pub fn find_pedigree_synonym_column(target: &str, headers: &[String]) -> Option<usize> {
+    if let Some(pos) = headers.iter().position(|h| h.eq_ignore_ascii_case(target)) {
+        return Some(pos);
+    }
+
+    let lower_target = target.to_lowercase();
+    for (_, _, synonyms) in PEDIGREE_SYNONYM_GROUPS {
+        if synonyms.iter().any(|&s| s == lower_target) {
+            for (idx, h) in headers.iter().enumerate() {
+                let lower_h = h.to_lowercase();
+                if synonyms.iter().any(|&s| s == lower_h) {
+                    return Some(idx);
+                }
+            }
+        }
+    }
+
+    None
 }

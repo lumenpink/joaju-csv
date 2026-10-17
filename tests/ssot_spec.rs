@@ -117,3 +117,45 @@ fn test_error_on_unknown_column() {
         other => panic!("Erro inesperado: {:?}", other),
     }
 }
+
+#[test]
+fn test_pedigree_official_and_pt_synonyms_in_select() {
+    // CSV original com nomes oficiais em inglês (pedtools/LINKAGE)
+    let csv = "id,fid,mid,sex,aff,proband\n1,0,0,1,1,0\n2,0,0,2,1,0\n3,1,2,2,2,1\n";
+    let ds = Dataset::from_csv(csv).expect("parsing falhou");
+
+    // Consulta usando adaptações em português
+    let projected = ds
+        .apply_select("id, pai, mae, sexo, aff as fenotipo, probando")
+        .expect("select com sinônimos falhou");
+
+    assert_eq!(
+        projected.headers(),
+        &["id", "pai", "mae", "sexo", "fenotipo", "probando"]
+    );
+    assert_eq!(
+        projected.get_row(2).unwrap(),
+        &["3", "1", "2", "2", "2", "1"]
+    );
+}
+
+#[test]
+fn test_canonicalize_pedigree_headers() {
+    // Oficial -> Português
+    let csv_official = "id,fid,mid,sex,aff,proband\n1,0,0,1,1,0\n";
+    let ds_off = Dataset::from_csv(csv_official).unwrap();
+    let ds_pt = ds_off.canonicalize_pedigree_pt();
+    assert_eq!(
+        ds_pt.headers(),
+        &["id", "pai", "mae", "sexo", "fenotipo", "probando"]
+    );
+
+    // Português -> Oficial
+    let csv_pt = "id,pai,mae,sexo,fenotipo,probando\n1,0,0,1,1,0\n";
+    let ds_pt_in = Dataset::from_csv(csv_pt).unwrap();
+    let ds_off_out = ds_pt_in.canonicalize_pedigree_official();
+    assert_eq!(
+        ds_off_out.headers(),
+        &["id", "fid", "mid", "sex", "aff", "proband"]
+    );
+}
