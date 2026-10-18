@@ -5,6 +5,11 @@ edition = "2021"
 description = "Motor soberano em Rust para Fonte Única de Dados (SSOT), projeções e filtros tabulares"
 license = "Apache-2.0"
 repository = "https://codeberg.org/lumenpink/ssot-rs"
+homepage = "https://codeberg.org/lumenpink/ssot-rs"
+documentation = "https://docs.rs/ssot-rs"
+readme = "README.md"
+keywords = ["ssot", "csv", "tabular", "projection", "pedigree"]
+categories = ["command-line-utilities", "data-structures", "development-tools"]
 authors = ["Lumen Pink <hi@lumen.pink>"]
 
 [dependencies]

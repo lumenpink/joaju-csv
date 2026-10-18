@@ -1,3 +1,27 @@
+//! # ssot-rs
+//!
+//! Motor soberano em Rust para Fonte Única de Dados (*Single Source of Truth* / SSOT),
+//! projeções relacionais, filtros tabulares determinísticos e normalização de cabeçalhos.
+//!
+//! > ⚠️ **Aviso de Versão em Desenvolvimento Ativo (pre-1.0 / dev)**: Esta biblioteca
+//! > está em fase inicial de desenvolvimento ativo (`0.1.x`). A API pública pode
+//! > sofrer ajustes antes da versão estável 1.0.0.
+//!
+//! ## Exemplo Rápido
+//!
+//! ```rust
+//! use ssot_rs::Dataset;
+//!
+//! let csv = "id,nome,idade\n1,Ana,30\n2,Bruno,25\n";
+//! let ds = Dataset::from_csv(csv).unwrap();
+//!
+//! let filtrado = ds.apply_where("idade >= 30").unwrap();
+//! assert_eq!(filtrado.row_count(), 1);
+//!
+//! let projetado = filtrado.apply_select("nome as Colaborador").unwrap();
+//! assert_eq!(projetado.headers(), &["Colaborador"]);
+//! ```
+
 use regex::Regex;
 use std::collections::HashMap;
 use std::fs;
