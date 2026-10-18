@@ -5,31 +5,31 @@
 [![License: Apache-2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
 [![GOST](https://img.shields.io/badge/GOST-1.1.0-emerald.svg)](https://codeberg.org/lumenpink/gost)
 
-Motor soberano em Rust para manipulação tabular de CSV, projeções relacionais, filtros determinísticos e normalização de cabeçalhos.
+A fast, deterministic Rust library for tabular CSV manipulation, relational projections, conditional filtering, and header canonicalization.
 
 > ⚠️ **Early Development Notice (pre-1.0 / alpha)**  
 > This library is currently in early active development (`0.1.0`). It is NOT recommended for production use beyond experimental testing and research. APIs are subject to breaking changes prior to a stable 1.0.0 release.
 
 ---
 
-## 📖 Visão Geral
+## 📖 Overview
 
-`joaju-csv` permite carregar dados tabulares a partir de strings ou arquivos (CSV, TSV, DSV com delimitador `;`), extrair diretivas de cabeçalho iniciadas por `%%`, realizar projeções relacionais (`apply_select`) com suporte a aliases (`as`) e aplicar expressões de filtro (`apply_where`) numéricas e textuais com operadores `=`, `==`, `!=`, `<`, `<=`, `>`, `>=` e conectivos lógicos (`AND`, `and`, `&&`).
+`joaju-csv` enables loading tabular data from strings or files (CSV, TSV, DSV with `;` delimiter), extracting header directives prefixed by `%%`, performing relational projections (`apply_select`) with alias support (`as`), and applying filter expressions (`apply_where`) using numeric and textual comparisons (`=`, `==`, `!=`, `<`, `<=`, `>`, `>=`) along with logical connectives (`AND`, `and`, `&&`).
 
-Além disso, oferece suporte nativo à canonização e resolução de sinônimos genealógicos compatíveis com a especificação internacional de pedigree e suas variantes em português.
+Additionally, it provides built-in support for canonicalizing and resolving pedigree column synonyms compatible with international pedigree format specifications and localized variants.
 
 ---
 
-## 🚀 Instalação
+## 🚀 Installation
 
-Adicione `joaju-csv` ao seu `Cargo.toml`:
+Add `joaju-csv` to your `Cargo.toml`:
 
 ```toml
 [dependencies]
 joaju-csv = "0.1.0"
 ```
 
-Ou instale a ferramenta de linha de comando:
+Or install the CLI tool:
 
 ```bash
 cargo install joaju-csv
@@ -37,85 +37,85 @@ cargo install joaju-csv
 
 ---
 
-## 🛠️ Exemplo de Uso (Rust API)
+## 🛠️ Usage Example (Rust API)
 
 ```rust
 use joaju_csv::Dataset;
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let csv_data = "\
-id,nome,idade,cargo
-1,Ana,30,Engenharia
-2,Bruno,25,Design
-3,Carla,35,Engenharia
+id,name,age,department
+1,Alice,30,Engineering
+2,Bob,25,Design
+3,Carol,35,Engineering
 ";
 
-    // 1. Carregar dataset
+    // 1. Load dataset
     let ds = Dataset::from_csv(csv_data)?;
 
-    // 2. Filtrar por condição WHERE
-    let filtrado = ds.apply_where("idade >= 30 and cargo == Engenharia")?;
-    assert_eq!(filtrado.row_count(), 2);
+    // 2. Filter rows using WHERE condition
+    let filtered = ds.apply_where("age >= 30 and department == Engineering")?;
+    assert_eq!(filtered.row_count(), 2);
 
-    // 3. Projetar colunas com aliases (SELECT)
-    let projetado = filtrado.apply_select("nome as Colaborador, idade as Anos")?;
-    assert_eq!(projetado.headers(), &["Colaborador", "Anos"]);
+    // 3. Project columns with aliases (SELECT)
+    let projected = filtered.apply_select("name as Employee, age as Years")?;
+    assert_eq!(projected.headers(), &["Employee", "Years"]);
 
-    // 4. Exportar CSV resultante
-    let saida = projetado.to_csv()?;
-    println!("{}", saida);
+    // 4. Export resulting CSV
+    let output = projected.to_csv()?;
+    println!("{}", output);
 
     Ok(())
 }
 ```
 
-### Processamento com Diretivas de Bloco (`%%`)
+### Processing Block Directives (`%%`)
 
 ```rust
 use joaju_csv::split_block_content;
 
 let raw = "\
-%% title = Tabela de Membros
+%% title = Member Directory
 %% theme = dark
-id,nome
-1,Maria
+id,name
+1,Mary
 ";
 
 let (directives, clean_csv) = split_block_content(raw);
-assert_eq!(directives.get("title").map(|s| s.as_str()), Some("Tabela de Membros"));
+assert_eq!(directives.get("title").map(|s| s.as_str()), Some("Member Directory"));
 assert_eq!(directives.get("theme").map(|s| s.as_str()), Some("dark"));
 ```
 
 ---
 
-## 💻 Uso via CLI
+## 💻 CLI Usage
 
-A CLI `joaju-csv` aceita arquivos e opções de consulta diretamente pelo terminal:
+The `joaju-csv` CLI accepts input files and query parameters directly from the terminal:
 
 ```bash
-# Filtrar e projetar a partir de arquivo
-joaju-csv query dados.csv --where "idade >= 30" --select "nome,cargo"
+# Filter and project columns from a file
+joaju-csv query data.csv --where "age >= 30" --select "name,department"
 
-# Transformar cabeçalhos para o formato canônico de pedigree (PT)
-joaju-csv canonicalize dados.csv --target pt
+# Transform headers into canonical pedigree format
+joaju-csv canonicalize data.csv --target pt
 ```
 
 ---
 
-## 📋 Conformidade GOST
+## 📋 GOST Compliance
 
-Este projeto adota a norma **[GOST](https://codeberg.org/lumenpink/gost)** (Gosplan Standard for Technical Software).
-- **Versão GOST:** `1.1.0`
-- **Linguagens declaradas:** `rust,shell`
-- **Licença:** `Apache-2.0`
+This project adheres to the **[GOST](https://codeberg.org/lumenpink/gost)** specification (Gosplan Standard for Technical Software).
+- **GOST Version:** `1.1.0`
+- **Declared Languages:** `rust,shell`
+- **License:** `Apache-2.0`
 
 ```bash
-# Executar auditoria de qualidade estrita
+# Run strict compliance verification
 cccp check --strict
 ```
 
 ---
 
-## 📄 Licença
+## 📄 License
 
-Distribuído sob a licença [Apache-2.0](./LICENSE).
+Distributed under the [Apache-2.0](./LICENSE) license.

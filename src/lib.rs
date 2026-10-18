@@ -1,25 +1,25 @@
 //! # joaju-csv
 //!
-//! Motor soberano em Rust para manipulação tabular de CSV,
-//! projeções relacionais, filtros determinísticos e normalização de cabeçalhos.
+//! A fast and deterministic Rust library for tabular CSV manipulation,
+//! relational projections, filtering, and header canonicalization.
 //!
 //! > ⚠️ **Early Development Notice (pre-1.0 / alpha)**: This library is currently in early
 //! > active development (`0.1.0`). It is NOT recommended for production use beyond experimental
 //! > testing and research. APIs are subject to breaking changes prior to a stable 1.0.0 release.
 //!
-//! ## Exemplo Rápido
+//! ## Quick Example
 //!
 //! ```rust
 //! use joaju_csv::Dataset;
 //!
-//! let csv = "id,nome,idade\n1,Ana,30\n2,Bruno,25\n";
+//! let csv = "id,name,age\n1,Ana,30\n2,Bruno,25\n";
 //! let ds = Dataset::from_csv(csv).unwrap();
 //!
-//! let filtrado = ds.apply_where("idade >= 30").unwrap();
-//! assert_eq!(filtrado.row_count(), 1);
+//! let filtered = ds.apply_where("age >= 30").unwrap();
+//! assert_eq!(filtered.row_count(), 1);
 //!
-//! let projetado = filtrado.apply_select("nome as Colaborador").unwrap();
-//! assert_eq!(projetado.headers(), &["Colaborador"]);
+//! let projected = filtered.apply_select("name as Employee").unwrap();
+//! assert_eq!(projected.headers(), &["Employee"]);
 //! ```
 
 use regex::Regex;
@@ -30,22 +30,22 @@ use thiserror::Error;
 
 #[derive(Error, Debug)]
 pub enum CsvError {
-    #[error("Erro de I/O: {0}")]
+    #[error("I/O error: {0}")]
     Io(#[from] std::io::Error),
 
-    #[error("Erro de parsing CSV: {0}")]
+    #[error("CSV parsing error: {0}")]
     Csv(#[from] csv::Error),
 
-    #[error("Coluna não encontrada: {0}")]
+    #[error("Column not found: {0}")]
     ColumnNotFound(String),
 
-    #[error("Expressão de where inválida: {0}")]
+    #[error("Invalid WHERE clause: {0}")]
     InvalidWhereClause(String),
 
-    #[error("Expressão de select inválida: {0}")]
+    #[error("Invalid SELECT clause: {0}")]
     InvalidSelectClause(String),
 
-    #[error("Dataset vazio")]
+    #[error("Empty dataset")]
     EmptyDataset,
 }
 
@@ -182,7 +182,7 @@ impl Dataset {
 
         if projected_headers.is_empty() {
             return Err(CsvError::InvalidSelectClause(
-                "Nenhuma coluna selecionada".to_string(),
+                "No columns selected".to_string(),
             ));
         }
 
@@ -380,7 +380,7 @@ impl Condition {
         }
 
         Err(CsvError::InvalidWhereClause(format!(
-            "Operador não reconhecido em '{}'",
+            "Unrecognized operator in '{}'",
             raw
         )))
     }

@@ -2,7 +2,7 @@
 name = "joaju-csv"
 version = "0.1.0"
 edition = "2021"
-description = "Motor soberano em Rust para manipulação tabular de CSV, projeções relacionais e filtros determinísticos"
+description = "A fast and deterministic Rust library for tabular CSV manipulation, relational projections, and filtering"
 license = "Apache-2.0"
 repository = "https://codeberg.org/lumenpink/joaju-csv"
 homepage = "https://codeberg.org/lumenpink/joaju-csv"

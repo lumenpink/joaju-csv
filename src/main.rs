@@ -5,18 +5,18 @@ use std::path::PathBuf;
 #[derive(Parser, Debug)]
 #[command(name = "joaju-csv")]
 #[command(
-    about = "Motor soberano em Rust para manipulação tabular de CSV, projeções relacionais e filtros determinísticos"
+    about = "A fast and deterministic Rust CLI for tabular CSV manipulation, relational projections, and filtering"
 )]
 struct Cli {
-    /// Caminho do arquivo CSV de entrada
+    /// Path to input CSV file (reads from stdin if omitted)
     #[arg(short, long)]
     src: Option<PathBuf>,
 
-    /// Expressão de projeção de colunas com suporte a aliases (ex: "id, pai, fenotipo_abo as fenotipo")
+    /// Column projection expression with optional aliases (e.g. "id, father, phenotype as trait")
     #[arg(long)]
     select: Option<String>,
 
-    /// Expressão condicional de filtragem (ex: "geracao <= 3 and sex == F")
+    /// Conditional filtering expression (e.g. "generation <= 3 and sex == F")
     #[arg(long, name = "where")]
     where_clause: Option<String>,
 }
