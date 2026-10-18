@@ -1,9 +1,9 @@
 use clap::Parser;
-use ssot_rs::Dataset;
+use joaju_ssot::Dataset;
 use std::path::PathBuf;
 
 #[derive(Parser, Debug)]
-#[command(name = "ssot-rs")]
+#[command(name = "joaju-ssot")]
 #[command(
     about = "Motor soberano em Rust para Fonte Única de Dados (SSOT), projeções e filtros tabulares"
 )]

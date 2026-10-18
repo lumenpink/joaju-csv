@@ -1,7 +1,7 @@
-# ssot-rs
+# joaju-ssot
 
-[![crates.io](https://img.shields.io/crates/v/ssot-rs.svg)](https://crates.io/crates/ssot-rs)
-[![docs.rs](https://docs.rs/ssot-rs/badge.svg)](https://docs.rs/ssot-rs)
+[![crates.io](https://img.shields.io/crates/v/joaju-ssot.svg)](https://crates.io/crates/joaju-ssot)
+[![docs.rs](https://docs.rs/joaju-ssot/badge.svg)](https://docs.rs/joaju-ssot)
 [![License: Apache-2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
 [![GOST](https://img.shields.io/badge/GOST-1.1.0-emerald.svg)](https://codeberg.org/lumenpink/gost)
 
@@ -14,7 +14,7 @@ Motor soberano em Rust para Fonte Única de Dados (*Single Source of Truth* / SS
 
 ## 📖 Visão Geral
 
-`ssot-rs` permite carregar dados tabulares a partir de strings ou arquivos (CSV, TSV, DSV com delimitador `;`), extrair diretivas de cabeçalho iniciadas por `%%`, realizar projeções relacionais (`apply_select`) com suporte a aliases (`as`) e aplicar expressões de filtro (`apply_where`) numéricas e textuais com operadores `=`, `==`, `!=`, `<`, `<=`, `>`, `>=` e conectivos lógicos (`AND`, `and`, `&&`).
+`joaju-ssot` permite carregar dados tabulares a partir de strings ou arquivos (CSV, TSV, DSV com delimitador `;`), extrair diretivas de cabeçalho iniciadas por `%%`, realizar projeções relacionais (`apply_select`) com suporte a aliases (`as`) e aplicar expressões de filtro (`apply_where`) numéricas e textuais com operadores `=`, `==`, `!=`, `<`, `<=`, `>`, `>=` e conectivos lógicos (`AND`, `and`, `&&`).
 
 Além disso, oferece suporte nativo à canonização e resolução de sinônimos genealógicos compatíveis com a especificação internacional de pedigree e suas variantes em português.
 
@@ -22,17 +22,17 @@ Além disso, oferece suporte nativo à canonização e resolução de sinônimos
 
 ## 🚀 Instalação
 
-Adicione `ssot-rs` ao seu `Cargo.toml`:
+Adicione `joaju-ssot` ao seu `Cargo.toml`:
 
 ```toml
 [dependencies]
-ssot-rs = "0.1.0"
+joaju-ssot = "0.1.0"
 ```
 
 Ou instale a ferramenta de linha de comando:
 
 ```bash
-cargo install ssot-rs
+cargo install joaju-ssot
 ```
 
 ---
@@ -40,7 +40,7 @@ cargo install ssot-rs
 ## 🛠️ Exemplo de Uso (Rust API)
 
 ```rust
-use ssot_rs::Dataset;
+use joaju_ssot::Dataset;
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let csv_data = "\
@@ -72,7 +72,7 @@ id,nome,idade,cargo
 ### Processamento com Diretivas de Bloco (`%%`)
 
 ```rust
-use ssot_rs::split_block_content;
+use joaju_ssot::split_block_content;
 
 let raw = "\
 %% title = Tabela de Membros
@@ -90,14 +90,14 @@ assert_eq!(directives.get("theme").map(|s| s.as_str()), Some("dark"));
 
 ## 💻 Uso via CLI
 
-A CLI `ssot-rs` aceita arquivos e opções de consulta diretamente pelo terminal:
+A CLI `joaju-ssot` aceita arquivos e opções de consulta diretamente pelo terminal:
 
 ```bash
 # Filtrar e projetar a partir de arquivo
-ssot-rs query dados.csv --where "idade >= 30" --select "nome,cargo"
+joaju-ssot query dados.csv --where "idade >= 30" --select "nome,cargo"
 
 # Transformar cabeçalhos para o formato canônico de pedigree (PT)
-ssot-rs canonicalize dados.csv --target pt
+joaju-ssot canonicalize dados.csv --target pt
 ```
 
 ---

@@ -1,4 +1,4 @@
-//! # ssot-rs
+//! # joaju-ssot
 //!
 //! Motor soberano em Rust para Fonte Única de Dados (*Single Source of Truth* / SSOT),
 //! projeções relacionais, filtros tabulares determinísticos e normalização de cabeçalhos.
@@ -10,7 +10,7 @@
 //! ## Exemplo Rápido
 //!
 //! ```rust
-//! use ssot_rs::Dataset;
+//! use joaju_ssot::Dataset;
 //!
 //! let csv = "id,nome,idade\n1,Ana,30\n2,Bruno,25\n";
 //! let ds = Dataset::from_csv(csv).unwrap();

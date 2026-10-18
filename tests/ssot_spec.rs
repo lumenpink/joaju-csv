@@ -1,4 +1,4 @@
-use ssot_rs::{Dataset, SsotError};
+use joaju_ssot::{Dataset, SsotError};
 
 #[test]
 fn test_parse_csv_basic() {
@@ -87,7 +87,7 @@ fn test_parse_block_directives() {
 %% where=geracao <= 3
 %% layout.width=95%
 "#;
-    let directives = ssot_rs::parse_block_directives(block);
+    let directives = joaju_ssot::parse_block_directives(block);
     assert_eq!(directives.get("src").unwrap(), "dados/familia.csv");
     assert_eq!(
         directives.get("select").unwrap(),
