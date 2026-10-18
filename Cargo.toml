@@ -1,6 +1,6 @@
 [package]
 name = "ssot-rs"
-version = "0.1.0-dev.1"
+version = "0.1.0"
 edition = "2021"
 description = "Motor soberano em Rust para Fonte Única de Dados (SSOT), projeções e filtros tabulares"
 license = "Apache-2.0"

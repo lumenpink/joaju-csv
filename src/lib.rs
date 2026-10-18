@@ -3,9 +3,9 @@
 //! Motor soberano em Rust para Fonte Única de Dados (*Single Source of Truth* / SSOT),
 //! projeções relacionais, filtros tabulares determinísticos e normalização de cabeçalhos.
 //!
-//! > ⚠️ **Aviso de Versão em Desenvolvimento Ativo (pre-1.0 / dev)**: Esta biblioteca
-//! > está em fase inicial de desenvolvimento ativo (`0.1.x`). A API pública pode
-//! > sofrer ajustes antes da versão estável 1.0.0.
+//! > ⚠️ **Early Development Notice (pre-1.0 / alpha)**: This library is currently in early
+//! > active development (`0.1.0`). It is NOT recommended for production use beyond experimental
+//! > testing and research. APIs are subject to breaking changes prior to a stable 1.0.0 release.
 //!
 //! ## Exemplo Rápido
 //!
