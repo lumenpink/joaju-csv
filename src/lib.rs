@@ -1,7 +1,7 @@
-//! # joaju-ssot
+//! # joaju-csv
 //!
-//! Motor soberano em Rust para Fonte Única de Dados (*Single Source of Truth* / SSOT),
-//! projeções relacionais, filtros tabulares determinísticos e normalização de cabeçalhos.
+//! Motor soberano em Rust para manipulação tabular de CSV,
+//! projeções relacionais, filtros determinísticos e normalização de cabeçalhos.
 //!
 //! > ⚠️ **Early Development Notice (pre-1.0 / alpha)**: This library is currently in early
 //! > active development (`0.1.0`). It is NOT recommended for production use beyond experimental
@@ -10,7 +10,7 @@
 //! ## Exemplo Rápido
 //!
 //! ```rust
-//! use joaju_ssot::Dataset;
+//! use joaju_csv::Dataset;
 //!
 //! let csv = "id,nome,idade\n1,Ana,30\n2,Bruno,25\n";
 //! let ds = Dataset::from_csv(csv).unwrap();
@@ -29,7 +29,7 @@ use std::path::Path;
 use thiserror::Error;
 
 #[derive(Error, Debug)]
-pub enum SsotError {
+pub enum CsvError {
     #[error("Erro de I/O: {0}")]
     Io(#[from] std::io::Error),
 
@@ -48,6 +48,8 @@ pub enum SsotError {
     #[error("Dataset vazio")]
     EmptyDataset,
 }
+
+pub type SsotError = CsvError;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Dataset {
@@ -80,7 +82,7 @@ impl Dataset {
         &self.rows
     }
 
-    pub fn from_csv(content: &str) -> Result<Self, SsotError> {
+    pub fn from_csv(content: &str) -> Result<Self, CsvError> {
         let clean_content: Vec<&str> = content
             .lines()
             .map(|l| l.trim())
@@ -88,7 +90,7 @@ impl Dataset {
             .collect();
 
         if clean_content.is_empty() {
-            return Err(SsotError::EmptyDataset);
+            return Err(CsvError::EmptyDataset);
         }
 
         let first_line = clean_content[0];
@@ -130,12 +132,12 @@ impl Dataset {
         Ok(Self { headers, rows })
     }
 
-    pub fn from_file<P: AsRef<Path>>(path: P) -> Result<Self, SsotError> {
+    pub fn from_file<P: AsRef<Path>>(path: P) -> Result<Self, CsvError> {
         let content = fs::read_to_string(path)?;
         Self::from_csv(&content)
     }
 
-    pub fn to_csv(&self) -> Result<String, SsotError> {
+    pub fn to_csv(&self) -> Result<String, CsvError> {
         let mut wtr = csv::WriterBuilder::new().from_writer(vec![]);
         wtr.write_record(&self.headers)?;
         for row in &self.rows {
@@ -146,7 +148,7 @@ impl Dataset {
         Ok(String::from_utf8_lossy(&bytes).to_string())
     }
 
-    pub fn apply_select(&self, select_expr: &str) -> Result<Self, SsotError> {
+    pub fn apply_select(&self, select_expr: &str) -> Result<Self, CsvError> {
         let trimmed = select_expr.trim();
         if trimmed.is_empty() || trimmed == "*" {
             return Ok(self.clone());
@@ -172,14 +174,14 @@ impl Dataset {
             };
 
             let idx = find_pedigree_synonym_column(src_name, &self.headers)
-                .ok_or_else(|| SsotError::ColumnNotFound(src_name.to_string()))?;
+                .ok_or_else(|| CsvError::ColumnNotFound(src_name.to_string()))?;
 
             col_indices.push(idx);
             projected_headers.push(target_name.to_string());
         }
 
         if projected_headers.is_empty() {
-            return Err(SsotError::InvalidSelectClause(
+            return Err(CsvError::InvalidSelectClause(
                 "Nenhuma coluna selecionada".to_string(),
             ));
         }
@@ -199,7 +201,7 @@ impl Dataset {
         })
     }
 
-    pub fn apply_where(&self, where_expr: &str) -> Result<Self, SsotError> {
+    pub fn apply_where(&self, where_expr: &str) -> Result<Self, CsvError> {
         let trimmed = where_expr.trim();
         if trimmed.is_empty() {
             return Ok(self.clone());
@@ -215,7 +217,7 @@ impl Dataset {
             vec![trimmed]
         };
 
-        let parsed_clauses: Result<Vec<Condition>, SsotError> = clauses
+        let parsed_clauses: Result<Vec<Condition>, CsvError> = clauses
             .iter()
             .map(|c| Condition::parse(c.trim(), &self.headers))
             .collect();
@@ -246,7 +248,7 @@ impl Dataset {
         &self,
         select_expr: Option<&str>,
         where_expr: Option<&str>,
-    ) -> Result<Self, SsotError> {
+    ) -> Result<Self, CsvError> {
         let mut result = if let Some(w) = where_expr {
             self.apply_where(w)?
         } else {
@@ -345,7 +347,7 @@ struct Condition {
 }
 
 impl Condition {
-    fn parse(clause: &str, headers: &[String]) -> Result<Self, SsotError> {
+    fn parse(clause: &str, headers: &[String]) -> Result<Self, CsvError> {
         let raw = clause.trim();
         let ops = [
             ("<=", Operator::Lte),
@@ -367,7 +369,7 @@ impl Condition {
                     .to_string();
 
                 let col_index = find_pedigree_synonym_column(col_name, headers)
-                    .ok_or_else(|| SsotError::ColumnNotFound(col_name.to_string()))?;
+                    .ok_or_else(|| CsvError::ColumnNotFound(col_name.to_string()))?;
 
                 return Ok(Self {
                     col_index,
@@ -377,7 +379,7 @@ impl Condition {
             }
         }
 
-        Err(SsotError::InvalidWhereClause(format!(
+        Err(CsvError::InvalidWhereClause(format!(
             "Operador não reconhecido em '{}'",
             raw
         )))

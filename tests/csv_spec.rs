@@ -1,4 +1,4 @@
-use joaju_ssot::{Dataset, SsotError};
+use joaju_csv::{CsvError, Dataset};
 
 #[test]
 fn test_parse_csv_basic() {
@@ -87,7 +87,7 @@ fn test_parse_block_directives() {
 %% where=geracao <= 3
 %% layout.width=95%
 "#;
-    let directives = joaju_ssot::parse_block_directives(block);
+    let directives = joaju_csv::parse_block_directives(block);
     assert_eq!(directives.get("src").unwrap(), "dados/familia.csv");
     assert_eq!(
         directives.get("select").unwrap(),
@@ -113,7 +113,7 @@ fn test_error_on_unknown_column() {
     let ds = Dataset::from_csv(csv).unwrap();
     let err = ds.apply_select("id, coluna_inexistente").unwrap_err();
     match err {
-        SsotError::ColumnNotFound(col) => assert_eq!(col, "coluna_inexistente"),
+        CsvError::ColumnNotFound(col) => assert_eq!(col, "coluna_inexistente"),
         other => panic!("Erro inesperado: {:?}", other),
     }
 }

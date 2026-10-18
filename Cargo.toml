@@ -1,14 +1,14 @@
 [package]
-name = "joaju-ssot"
+name = "joaju-csv"
 version = "0.1.0"
 edition = "2021"
-description = "Motor soberano em Rust para Fonte Única de Dados (SSOT), projeções e filtros tabulares"
+description = "Motor soberano em Rust para manipulação tabular de CSV, projeções relacionais e filtros determinísticos"
 license = "Apache-2.0"
-repository = "https://codeberg.org/lumenpink/joaju-ssot"
-homepage = "https://codeberg.org/lumenpink/joaju-ssot"
-documentation = "https://docs.rs/joaju-ssot"
+repository = "https://codeberg.org/lumenpink/joaju-csv"
+homepage = "https://codeberg.org/lumenpink/joaju-csv"
+documentation = "https://docs.rs/joaju-csv"
 readme = "README.md"
-keywords = ["ssot", "csv", "tabular", "projection", "pedigree"]
+keywords = ["csv", "tabular", "filter", "projection", "dataframe"]
 categories = ["command-line-utilities", "data-structures", "development-tools"]
 authors = ["Lumen Pink <hi@lumen.pink>"]
 
@@ -27,10 +27,10 @@ default = ["cli"]
 cli = ["dep:clap"]
 
 [[bin]]
-name = "joaju-ssot"
+name = "joaju-csv"
 path = "src/main.rs"
 required-features = ["cli"]
 
 [lib]
-name = "joaju_ssot"
+name = "joaju_csv"
 path = "src/lib.rs"

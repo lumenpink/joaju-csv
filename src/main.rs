@@ -1,11 +1,11 @@
 use clap::Parser;
-use joaju_ssot::Dataset;
+use joaju_csv::Dataset;
 use std::path::PathBuf;
 
 #[derive(Parser, Debug)]
-#[command(name = "joaju-ssot")]
+#[command(name = "joaju-csv")]
 #[command(
-    about = "Motor soberano em Rust para Fonte Única de Dados (SSOT), projeções e filtros tabulares"
+    about = "Motor soberano em Rust para manipulação tabular de CSV, projeções relacionais e filtros determinísticos"
 )]
 struct Cli {
     /// Caminho do arquivo CSV de entrada
