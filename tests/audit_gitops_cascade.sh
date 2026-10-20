@@ -40,6 +40,11 @@ if ! grep -q "cargo publish --registry lumen" "$WORKFLOW"; then
   exit 1
 fi
 
+if ! grep -q "rustup component add" "$WORKFLOW"; then
+  echo "✘ [FALHA] $WORKFLOW nao adiciona componentes rustfmt/clippy!"
+  exit 1
+fi
+
 if ! grep -q "CANONICAL_VERSION" "$WORKFLOW"; then
   echo "✘ [FALHA] $WORKFLOW nao sincroniza a versao canonica!"
   exit 1
