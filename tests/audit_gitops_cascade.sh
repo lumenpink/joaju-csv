@@ -35,11 +35,14 @@ if ! grep -q "cargo publish --registry lumen" "$WORKFLOW"; then
   exit 1
 fi
 
-for downstream in joaju-table joaju-pedigree joaju; do
-  if ! grep -q "repos/lumenpink/$downstream/actions/workflows/ci.yaml/dispatches" "$WORKFLOW"; then
-    echo "✘ [FALHA] $WORKFLOW nao dispara a esteira de $downstream!"
-    exit 1
-  fi
-done
+if ! grep -q 'repos/lumenpink/\$target/actions/workflows/ci.yaml/dispatches' "$WORKFLOW"; then
+  echo "✘ [FALHA] $WORKFLOW nao dispara as esteiras downstream!"
+  exit 1
+fi
+
+if ! grep -q 'joaju-table joaju-pedigree joaju' "$WORKFLOW"; then
+  echo "✘ [FALHA] $WORKFLOW nao lista todos os alvos downstream (joaju-table, joaju-pedigree, joaju)!"
+  exit 1
+fi
 
 echo "✔ [PASS] Auditoria GitOps cascade em joaju-csv validada com sucesso."
