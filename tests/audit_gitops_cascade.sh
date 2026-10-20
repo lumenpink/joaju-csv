@@ -20,6 +20,11 @@ if [ ! -f "$WORKFLOW" ]; then
   exit 1
 fi
 
+python3 -c "import yaml; yaml.safe_load(open('$WORKFLOW'))" || {
+  echo "✘ [FALHA] $WORKFLOW possui sintaxe YAML invalida!"
+  exit 1
+}
+
 if ! grep -q "workflow_dispatch:" "$WORKFLOW"; then
   echo "✘ [FALHA] $WORKFLOW nao declara 'workflow_dispatch:'!"
   exit 1
@@ -32,6 +37,11 @@ fi
 
 if ! grep -q "cargo publish --registry lumen" "$WORKFLOW"; then
   echo "✘ [FALHA] $WORKFLOW nao publica no registry soberano lumen!"
+  exit 1
+fi
+
+if ! grep -q "CANONICAL_VERSION" "$WORKFLOW"; then
+  echo "✘ [FALHA] $WORKFLOW nao sincroniza a versao canonica!"
   exit 1
 fi
 

@@ -35,15 +35,9 @@ jobs:
       - name: "Configure Sovereign Lumen Cargo Registry"
         run: |
           mkdir -p "$HOME/.cargo"
-          cat <<'EOF' > "$HOME/.cargo/config.toml"
-[registries.lumen]
-index = "sparse+https://git.2lp.in/api/packages/lumen/cargo/"
-EOF
+          printf '[registries.lumen]\nindex = "sparse+https://git.2lp.in/api/packages/lumen/cargo/"\n' > "$HOME/.cargo/config.toml"
           if [ -n "${{ secrets.LUMEN_REGISTRY_TOKEN }}" ]; then
-            cat <<EOF > "$HOME/.cargo/credentials.toml"
-[registries.lumen]
-token = "${{ secrets.LUMEN_REGISTRY_TOKEN }}"
-EOF
+            printf '[registries.lumen]\ntoken = "%s"\n' "${{ secrets.LUMEN_REGISTRY_TOKEN }}" > "$HOME/.cargo/credentials.toml"
           fi
 
       - name: "Format Check"
@@ -78,23 +72,20 @@ EOF
           LUMEN_TOKEN: ${{ secrets.LUMEN_REGISTRY_TOKEN }}
         run: |
           mkdir -p "$HOME/.cargo"
-          cat <<'EOF' > "$HOME/.cargo/config.toml"
-[registries.lumen]
-index = "sparse+https://git.2lp.in/api/packages/lumen/cargo/"
-EOF
+          printf '[registries.lumen]\nindex = "sparse+https://git.2lp.in/api/packages/lumen/cargo/"\n' > "$HOME/.cargo/config.toml"
           if [ -n "$LUMEN_TOKEN" ]; then
-            cat <<EOF > "$HOME/.cargo/credentials.toml"
-[registries.lumen]
-token = "$LUMEN_TOKEN"
-EOF
+            printf '[registries.lumen]\ntoken = "%s"\n' "$LUMEN_TOKEN" > "$HOME/.cargo/credentials.toml"
           fi
 
       - name: "Publish Crate to Sovereign Lumen Registry"
         run: |
+          CANONICAL_VERSION=$(head -n 1 VERSION | tr -d ' \r\n')
+          echo "-> Sincronizando Cargo.toml para a versao canonica: $CANONICAL_VERSION"
+          sed -i "0,/^version = .*/s//version = \"${CANONICAL_VERSION}\"/" Cargo.toml
           echo "-> Publicando joaju-csv no registry lumen..."
-          cargo publish --registry lumen || echo "::warning::Versao ja publicada ou falha tolerada no registry."
+          cargo publish --registry lumen --allow-dirty || echo "::warning::Versao ja publicada ou falha tolerada no registry."
 
-      - name: "GitOps Cascade — Dispatch Downstream Satellites & joaju"
+      - name: "GitOps Cascade — Dispatch Downstream Satellites & Joaju"
         env:
           CODEBERG_TOKEN: ${{ secrets.CODEBERG_TOKEN }}
         run: |
@@ -106,8 +97,8 @@ EOF
                 -H "Content-Type: application/json" \
                 "https://codeberg.org/api/v1/repos/lumenpink/$target/actions/workflows/ci.yaml/dispatches" \
                 -d '{"ref": "main"}' || true
-              echo "✔ Disparo enviado para $target com sucesso."
             done
+            echo "✔ Disparos enviados com sucesso."
           else
-            echo "CODEBERG_TOKEN ausente, pulando disparo downstream."
+            echo "CODEBERG_TOKEN ausente, pulando disparos downstream."
           fi
