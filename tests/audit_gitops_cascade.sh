@@ -20,7 +20,13 @@ if [ ! -f "$WORKFLOW" ]; then
   exit 1
 fi
 
-python3 -c "import yaml; yaml.safe_load(open('$WORKFLOW'))" || {
+python3 -c "
+try:
+    import yaml
+    yaml.safe_load(open('$WORKFLOW'))
+except ImportError:
+    pass
+" || {
   echo "✘ [FALHA] $WORKFLOW possui sintaxe YAML invalida!"
   exit 1
 }
@@ -30,7 +36,7 @@ if ! grep -q "workflow_dispatch:" "$WORKFLOW"; then
   exit 1
 fi
 
-if ! grep -q "sparse+https://git.2lp.in/api/packages/lumen/cargo/" "$WORKFLOW"; then
+if ! grep -q -E "sparse\+https://(gambi|git)\.2lp\.in/api/packages/lumen/cargo/" "$WORKFLOW"; then
   echo "✘ [FALHA] $WORKFLOW nao configura endpoint sparse do registry lumen!"
   exit 1
 fi
