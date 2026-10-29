@@ -66,4 +66,9 @@ if ! grep -q 'joaju-table joaju-pedigree joaju' "$WORKFLOW"; then
   exit 1
 fi
 
+if ! grep -q 'token = "Bearer %s"' "$WORKFLOW"; then
+  echo "✘ [FALHA] $WORKFLOW nao utiliza autenticacao Bearer para o cargo!"
+  exit 1
+fi
+
 echo "✔ [PASS] Auditoria GitOps cascade em joaju-csv validada com sucesso."
