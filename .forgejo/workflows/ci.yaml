@@ -32,12 +32,14 @@ jobs:
           fi
           rustup component add rustfmt clippy 2>/dev/null || true
 
-      - name: "Configure Sovereign Lumen Cargo Registry"
+      - name: "Configure Cargo Registries"
         run: |
           mkdir -p "$HOME/.cargo"
-          printf '[registries.lumen]\nindex = "sparse+https://gambi.2lp.in/api/packages/lumen/cargo/"\n' > "$HOME/.cargo/config.toml"
-          if [ -n "${{ secrets.LUMEN_REGISTRY_TOKEN }}" ]; then
-            printf '[registries.lumen]\ntoken = "%s"\n' "${{ secrets.LUMEN_REGISTRY_TOKEN }}" > "$HOME/.cargo/credentials.toml"
+          printf '[registries.gambi]\nindex = "sparse+https://gambi.2lp.in/api/packages/lumen/cargo/"\n' > "$HOME/.cargo/config.toml"
+          printf '[registries.lumen]\nindex = "sparse+https://gambi.2lp.in/api/packages/lumen/cargo/"\n' >> "$HOME/.cargo/config.toml"
+          TOKEN="${{ secrets.REGISTRY_TOKEN || secrets.GAMBI_2LP_IN_TOKEN || secrets.LUMEN_REGISTRY_TOKEN || secrets.FORGEJO_TOKEN }}"
+          if [ -n "$TOKEN" ]; then
+            printf '[registries.gambi]\ntoken = "Bearer %s"\n[registries.lumen]\ntoken = "Bearer %s"\n' "$TOKEN" "$TOKEN" > "$HOME/.cargo/credentials.toml"
           fi
 
       - name: "Format Check"
@@ -69,17 +71,19 @@ jobs:
       - name: "Checkout repository"
         uses: actions/checkout@v4
 
-      - name: "Configure Sovereign Lumen Cargo Credentials"
+      - name: "Configure Cargo Credentials"
         env:
-          LUMEN_TOKEN: ${{ secrets.LUMEN_REGISTRY_TOKEN }}
+          REGISTRY_TOKEN: ${{ secrets.REGISTRY_TOKEN || secrets.GAMBI_2LP_IN_TOKEN || secrets.LUMEN_REGISTRY_TOKEN || secrets.FORGEJO_TOKEN }}
         run: |
           mkdir -p "$HOME/.cargo"
-          printf '[registries.lumen]\nindex = "sparse+https://gambi.2lp.in/api/packages/lumen/cargo/"\n' > "$HOME/.cargo/config.toml"
-          if [ -n "$LUMEN_TOKEN" ]; then
-            printf '[registries.lumen]\ntoken = "%s"\n' "$LUMEN_TOKEN" > "$HOME/.cargo/credentials.toml"
+          printf '[registries.gambi]\nindex = "sparse+https://gambi.2lp.in/api/packages/lumen/cargo/"\n' > "$HOME/.cargo/config.toml"
+          printf '[registries.lumen]\nindex = "sparse+https://gambi.2lp.in/api/packages/lumen/cargo/"\n' >> "$HOME/.cargo/config.toml"
+          TOKEN="${REGISTRY_TOKEN}"
+          if [ -n "$TOKEN" ]; then
+            printf '[registries.gambi]\ntoken = "Bearer %s"\n[registries.lumen]\ntoken = "Bearer %s"\n' "$TOKEN" "$TOKEN" > "$HOME/.cargo/credentials.toml"
           fi
 
-      - name: "Publish Crate to Sovereign Lumen Registry"
+      - name: "Publish Crate to Lumen Registry"
         run: |
           CANONICAL_VERSION=$(head -n 1 VERSION | tr -d ' \r\n')
           echo "-> Sincronizando Cargo.toml para a versao canonica: $CANONICAL_VERSION"
