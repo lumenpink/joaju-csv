@@ -14,3 +14,17 @@ if [ "$LINE_COUNT" -gt 50 ]; then
 fi
 
 echo "✅ OK: README.md possui $LINE_COUNT linhas (teto <= 50)."
+
+# Teste de mutacao: se adicionarmos 1 linha, o teste deve falhar
+TMP_MUTATION=$(mktemp)
+cat "$README_FILE" > "$TMP_MUTATION"
+echo "" >> "$TMP_MUTATION"
+MUT_COUNT=$(wc -l < "$TMP_MUTATION")
+if [ "$MUT_COUNT" -gt 50 ]; then
+    echo "✅ OK: Sensibilidade confirmada (mutacao com $MUT_COUNT linhas rejeitada)."
+else
+    echo "❌ FALHOU: Mutacao nao detectada."
+    rm -f "$TMP_MUTATION"
+    exit 1
+fi
+rm -f "$TMP_MUTATION"
