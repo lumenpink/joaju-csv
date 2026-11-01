@@ -101,7 +101,7 @@ jobs:
               curl -s -X POST \
                 -H "Authorization: token $CODEBERG_TOKEN" \
                 -H "Content-Type: application/json" \
-                "https://codeberg.org/api/v1/repos/lumenpink/$target/actions/workflows/ci.yaml/dispatches" \
+                "https://codeberg.org/api/v1/repos/lumenpink/$target/actions/workflows/ci.yml/dispatches" \
                 -d '{"ref": "main"}' || true
             done
             echo "✔ Disparos enviados com sucesso."
