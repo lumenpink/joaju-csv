@@ -8,10 +8,10 @@ set -euo pipefail
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$REPO_ROOT"
 
-WORKFLOW=".forgejo/workflows/ci.yaml"
+WORKFLOW=".forgejo/workflows/ci.yml"
 
-if [ -f ".forgejo/workflows/publish.yaml" ]; then
-  echo "✘ [FALHA] publish.yaml legado para crates.io ainda presente!"
+if [ -f ".forgejo/workflows/publish.yaml" ] || [ -f ".forgejo/workflows/publish.yml" ]; then
+  echo "✘ [FALHA] publish legado para crates.io ainda presente!"
   exit 1
 fi
 
@@ -42,7 +42,7 @@ if ! grep -q -E "sparse\+https://(gambi|git)\.2lp\.in/api/packages/lumen/cargo/"
 fi
 
 if ! grep -q "cargo publish --registry lumen" "$WORKFLOW"; then
-  echo "✘ [FALHA] $WORKFLOW nao publica no registry soberano lumen!"
+  echo "✘ [FALHA] $WORKFLOW nao publica no registry lumen!"
   exit 1
 fi
 
@@ -56,7 +56,7 @@ if ! grep -q "CANONICAL_VERSION" "$WORKFLOW"; then
   exit 1
 fi
 
-if ! grep -q 'repos/lumenpink/\$target/actions/workflows/ci.yaml/dispatches' "$WORKFLOW"; then
+if ! grep -q 'repos/lumenpink/\$target/actions/workflows/ci.yml/dispatches' "$WORKFLOW"; then
   echo "✘ [FALHA] $WORKFLOW nao dispara as esteiras downstream!"
   exit 1
 fi
