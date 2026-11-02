@@ -1,6 +1,6 @@
 [package]
 name = "joaju-csv"
-version = "0.2.0-dev.35+20261102.c10708b"
+version = "0.2.0-dev.36+20261102.8e494f7"
 edition = "2021"
 description = "A fast and deterministic Rust library for tabular CSV manipulation, relational projections, and filtering"
 license = "Apache-2.0"

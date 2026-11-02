@@ -28,6 +28,9 @@ use std::fs;
 use std::path::Path;
 use thiserror::Error;
 
+/// Canonical SemVer version of the crate.
+pub const VERSION: &str = env!("CARGO_PKG_VERSION");
+
 #[derive(Error, Debug)]
 pub enum CsvError {
     #[error("I/O error: {0}")]

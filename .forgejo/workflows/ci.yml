@@ -61,7 +61,7 @@ jobs:
           fi
 
   publish-and-cascade:
-    name: "Publish Sovereign Crate & Cascade Downstream"
+    name: "Publish Canonical Crate & Cascade Downstream"
     runs-on: ubuntu-latest
     container:
       image: gambi.2lp.in/lumen/gost-ci-cross:latest
@@ -91,20 +91,12 @@ jobs:
           echo "-> Publicando joaju-csv no registry lumen..."
           cargo publish --registry lumen --allow-dirty || echo "::warning::Versao ja publicada ou falha tolerada no registry."
 
-      - name: "GitOps Cascade — Dispatch Downstream Satellites & Joaju"
-        env:
-          CODEBERG_TOKEN: ${{ secrets.CODEBERG_TOKEN }}
+      - name: "Notify Kombinat Daemon of Release Cascade"
         run: |
-          if [ -n "$CODEBERG_TOKEN" ]; then
-            for target in joaju-table joaju-pedigree joaju; do
-              echo "-> Notificando consumidor downstream ($target)..."
-              curl -s -X POST \
-                -H "Authorization: token $CODEBERG_TOKEN" \
-                -H "Content-Type: application/json" \
-                "https://codeberg.org/api/v1/repos/lumenpink/$target/actions/workflows/ci.yml/dispatches" \
-                -d '{"ref": "main"}' || true
-            done
-            echo "✔ Disparos enviados com sucesso."
-          else
-            echo "CODEBERG_TOKEN ausente, pulando disparos downstream."
-          fi
+          VERSION=$(head -n 1 VERSION | cut -d'+' -f1 | tr -d ' \r\n')
+          echo "★ Notificando Kombinat da publicação de joaju-csv@${VERSION}..."
+          curl -s -X POST http://127.0.0.1:4040/api/cascade/dispatch \
+            -H "Content-Type: application/json" \
+            -d "{\"package\": \"joaju-csv\", \"version\": \"${VERSION}\"}" || {
+            echo "::warning::Falha ao contatar Kombinat daemon em 127.0.0.1:4040. Continuando sem abortar CI."
+          }
