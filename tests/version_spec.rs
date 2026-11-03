@@ -22,3 +22,16 @@ fn test_ci_workflow_kombinat_notification() {
         "CI workflow must notify Kombinat cascade daemon on release"
     );
 }
+
+#[test]
+fn test_ci_workflow_no_duplicate_registries() {
+    let ci_yaml = std::fs::read_to_string(".forgejo/workflows/ci.yml").expect("ci.yml must exist");
+    assert!(
+        !ci_yaml.contains("[registries.gambi]"),
+        "CI workflow must not configure duplicate gambi registry when lumen registry is configured"
+    );
+    assert!(
+        ci_yaml.contains("[registries.lumen]"),
+        "CI workflow must configure lumen registry"
+    );
+}
