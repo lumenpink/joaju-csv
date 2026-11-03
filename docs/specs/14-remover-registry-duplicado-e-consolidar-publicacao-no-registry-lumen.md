@@ -22,4 +22,4 @@ Para garantir a publicação contínua e estável da crate, a configuração dev
 - Fase 9 (Close): Fechamento do ticket e merge.
 
 ## 4. Status do Ciclo DD-TDD
-- **Fase Atual:** Fase 6 (Refactor concluído, zero warnings).
+- **Fase Atual:** Fase 7 (Testes de asserção auditados contra regressão).
