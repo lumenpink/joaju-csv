@@ -42,7 +42,7 @@ jobs:
           fi
 
       - name: "Format Check"
-        run: cargo fmt -- --check
+        run: cargo fmt --check
 
       - name: "Clippy Check (Zero Warnings)"
         run: cargo clippy --all-targets -- -D warnings
@@ -88,13 +88,3 @@ jobs:
           sed -i "0,/^version = .*/s//version = \"${CANONICAL_VERSION}\"/" Cargo.toml
           echo "-> Publicando joaju-csv no registry lumen..."
           cargo publish --registry lumen --allow-dirty || echo "::warning::Versao ja publicada ou falha tolerada no registry."
-
-      - name: "Notify Kombinat Daemon of Release Cascade"
-        run: |
-          VERSION=$(head -n 1 VERSION | cut -d'+' -f1 | tr -d ' \r\n')
-          echo "★ Notificando Kombinat da publicação de joaju-csv@${VERSION}..."
-          curl -s -X POST http://127.0.0.1:4040/api/cascade/dispatch \
-            -H "Content-Type: application/json" \
-            -d "{\"package\": \"joaju-csv\", \"version\": \"${VERSION}\"}" || {
-            echo "::warning::Falha ao contatar Kombinat daemon em 127.0.0.1:4040. Continuando sem abortar CI."
-          }

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # ==============================================================================
 # tests/audit_gitops_cascade.sh
-# Valida integracao de workflow GitOps e cascata em joaju-csv (Ticket #7)
+# Valida integracao de workflow GitOps e cascata em joaju-csv (Ticket #7 e #15)
 # ==============================================================================
 set -euo pipefail
 
@@ -61,11 +61,6 @@ if ! grep -q "CANONICAL_VERSION" "$WORKFLOW"; then
   exit 1
 fi
 
-if ! grep -q "http://127.0.0.1:4040/api/cascade/dispatch" "$WORKFLOW"; then
-  echo "✘ [FALHA] $WORKFLOW nao notifica o Kombinat daemon!"
-  exit 1
-fi
-
 if grep -q "codeberg.org" "$WORKFLOW"; then
   echo "✘ [FALHA] $WORKFLOW ainda contem referencias ao Codeberg legado!"
   exit 1
@@ -73,6 +68,11 @@ fi
 
 if ! grep -q 'token = "Bearer %s"' "$WORKFLOW"; then
   echo "✘ [FALHA] $WORKFLOW nao utiliza autenticacao Bearer para o cargo!"
+  exit 1
+fi
+
+if grep -q "4040" "$WORKFLOW"; then
+  echo "✘ [FALHA] $WORKFLOW contem chamada legada a daemon na porta 4040 (agora orquestrado via webhook nativo Forgejo->Gossnab)!"
   exit 1
 fi
 

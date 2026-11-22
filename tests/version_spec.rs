@@ -11,15 +11,19 @@ fn test_rust_version_constant() {
 }
 
 #[test]
-fn test_ci_workflow_kombinat_notification() {
+fn test_ci_workflow_canonical_publish_and_no_legacy_daemon() {
     let ci_yaml = std::fs::read_to_string(".forgejo/workflows/ci.yml").expect("ci.yml must exist");
     assert!(
         !ci_yaml.contains("codeberg.org"),
         "Codeberg dispatch must be completely removed"
     );
     assert!(
-        ci_yaml.contains("http://127.0.0.1:4040/api/cascade/dispatch"),
-        "CI workflow must notify Kombinat cascade daemon on release"
+        !ci_yaml.contains("4040"),
+        "CI workflow must not contain legacy daemon dispatch on port 4040 (handled via Forgejo webhook -> Gossnab)"
+    );
+    assert!(
+        ci_yaml.contains("cargo publish --registry lumen"),
+        "CI workflow must publish to lumen registry"
     );
 }
 
